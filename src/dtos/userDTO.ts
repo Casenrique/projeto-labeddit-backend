@@ -4,20 +4,21 @@ export interface GetUserInputDTO {
 }
 
 export interface CreateUserInputDTO {
-    name: unknown,
+    nickName: unknown,
     email: unknown,
     password: unknown
 }
 
 export interface CreateUserOutputDTO {
+    message: string,
     token: string
 }
 
 export interface GetUserOutputDTO {
-    messsage: string,
+    message: string,
     user: {
         id: string,
-        name: string,
+        nickName: string,
         email: string,
         createdAt: string
     }
@@ -29,5 +30,6 @@ export interface LoginInputDTO {
 }
 
 export interface LoginOutputDTO {
+    message: string,
     token: string
 }

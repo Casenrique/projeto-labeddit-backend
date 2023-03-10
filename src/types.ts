@@ -5,14 +5,14 @@ export enum USER_ROLES {
 
 export interface TokenPayLoad {
     id: string,
-    name: string,
+    nickName: string,
     role: USER_ROLES
 }
 
 
 export interface UserDB {
     id: string,
-    name: string,
+    nick_name: string,
     email: string,
     password: string,
     role: USER_ROLES,
@@ -21,7 +21,7 @@ export interface UserDB {
 
 export interface UserModel {
     id: string,
-    name: string,
+    nickName: string,
     email: string,
     password: string,
     role: USER_ROLES,
