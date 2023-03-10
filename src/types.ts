@@ -40,7 +40,7 @@ export interface PostDB {
 
 export interface CreatorPost {
     id: string,
-    name: string    
+    nickName: string    
 }
 
 export interface PostCreatorModel {
@@ -52,7 +52,7 @@ export interface PostCreatorModel {
     updatedAt: string,
     creator: {
         id: string,
-        name: string
+        nickName: string
     }
 }
 
@@ -68,5 +68,5 @@ export enum POST_LIKE {
 }
 
 export interface PostWithCreatorDB extends PostDB {    
-    creator_name: string
+    creator_nick_name: string
 }
