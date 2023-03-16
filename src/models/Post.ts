@@ -6,6 +6,7 @@ export class Post {
         private content: string,
         private likes: number,
         private dislikes: number,
+        private replies: number,
         private createdAt: string,
         private updatedAt: string,
         private creator: {
@@ -20,6 +21,7 @@ export class Post {
             content: this.content,
             likes: this.likes,
             dislikes: this.dislikes,
+            replies: this.replies,
             created_at: this.createdAt,
             updated_at: this.updatedAt,
             creator_id: this.creator.id,
@@ -32,6 +34,7 @@ export class Post {
             content: this.content,
             likes: this.likes,
             dislikes: this.dislikes,
+            replies: this.replies,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             creator: this.creator
@@ -83,6 +86,18 @@ export class Post {
 
     public setDislikes(value: number): void {
         this.dislikes = value
+    }
+
+    public getReplies(): number {
+        return this.replies
+    }
+
+    public setReplies(value: number): void {
+        this.replies = value
+    }
+
+    public addReply() {
+        this.replies += 1
     }
 
     public getCreatedAt(): string {

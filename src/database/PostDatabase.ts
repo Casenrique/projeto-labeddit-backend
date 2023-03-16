@@ -1,10 +1,12 @@
-import { LikeDislikeDB, PostDB, PostWithCreatorDB, POST_LIKE } from "../types";
+import { LikeDislikeDB, PostDB, PostWithCommentsDB, PostWithCreatorDB, POST_LIKE } from "../types";
 import { BaseDatabase } from "./BaseDatabase";
+import { CommentDatabase } from "./CommentDatabase";
 import { UserDatabase } from "./UserDatabase";
 
 
 export class PostDatabase extends BaseDatabase {
     public static TABLE_POSTS = "posts"
+    public static TABLE_COMMENTS = "comments"
     public static TABLE_LIKES_DISLIKES_POSTS = "likes_dislikes_post"
 
     public getAllPosts = async () => {
@@ -80,6 +82,7 @@ export class PostDatabase extends BaseDatabase {
                 "posts.content",
                 "posts.likes",
                 "posts.dislikes",
+                "posts.replies",
                 "posts.created_at",
                 "posts.updated_at",
                 "users.nick_name AS creator_nick_name"
@@ -133,5 +136,6 @@ export class PostDatabase extends BaseDatabase {
                 post_id: likeDislikeDB.post_id
             })
     }
+    
 
 }

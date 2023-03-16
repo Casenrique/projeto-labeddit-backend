@@ -41,7 +41,7 @@ export class PostController {
             await this.postBusiness.createPost(input)
 
             const output: CreatePostOutputDTO = {
-                message: "Post criado com sucesso!"
+                message: "Post criado com sucesso!",
             }
 
             res.status(201).send(output)

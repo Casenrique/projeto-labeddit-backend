@@ -36,14 +36,15 @@ export class PostBusiness {
         const { 
             postsDB,
             creatorsDB
-         } = await this.postDatabase.getPostWithCreator(q)
+        } = await this.postDatabase.getPostWithCreator(q)
 
-         const posts: PostCreatorModel[] = postsDB.map((postDB) => {
+        const posts: PostCreatorModel[] = postsDB.map((postDB) => {
             const post = new Post(
                 postDB.id,
                 postDB.content,
                 postDB.likes,
                 postDB.dislikes,
+                postDB.replies,
                 postDB.created_at,
                 postDB.updated_at,
                 getCreator(postDB.creator_id)
@@ -52,7 +53,7 @@ export class PostBusiness {
             const postToBusinesModel = post.toBusinessModel()
                       
             return postToBusinesModel
-         })
+        })
     
         function getCreator(creatorId: string): CreatorPost {
             const creator = creatorsDB.find((creatorDB)  => {
@@ -100,6 +101,7 @@ export class PostBusiness {
         const post = new Post(
             id,
             content,
+            0,
             0,
             0,
             createdAt,
@@ -157,6 +159,7 @@ export class PostBusiness {
             postDB.content,
             postDB.likes,
             postDB.dislikes,
+            postDB.replies,
             postDB.created_at,
             postDB.updated_at,
             getCreator(creatorId, creatorNickName)
@@ -256,6 +259,7 @@ export class PostBusiness {
             postWithCreatorDB.content,
             postWithCreatorDB.likes,
             postWithCreatorDB.dislikes,
+            postWithCreatorDB.replies,
             postWithCreatorDB.created_at,
             postWithCreatorDB.updated_at,
             getCreator(creatorId, creatorNickName)
