@@ -55,20 +55,17 @@ export class UserBusiness {
         
         const { nickName, email, password } = input
         
-        if (!nickName || !email || !password) {
-            throw new BadRequestError("Dados inválidos")            
-        }
-
+        
         if (typeof nickName !== "string") {
             throw new BadRequestError("'nickName' deve ser string")
         }
 
         if (typeof email !== "string") {
-            throw new BadRequestError("'email' deve ser number")
+            throw new BadRequestError("'email' deve ser string")
         }
 
         if (typeof password !== "string") {
-            throw new BadRequestError("'password' deve ser number")
+            throw new BadRequestError("'password' deve ser string")
         }
       
         if (!email.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/)) {
@@ -122,17 +119,13 @@ export class UserBusiness {
     public login = async (input: LoginInputDTO): Promise<LoginOutputDTO> => {
         
         const { email, password } = input
-        
-        if ( !email || !password) {
-            throw new BadRequestError("Dados inválidos")            
-        }
-        
+                
         if (typeof email !== "string") {
-            throw new BadRequestError("'email' deve ser number")
+            throw new BadRequestError("'email' deve ser string")
         }
 
         if (typeof password !== "string") {
-            throw new BadRequestError("'password' deve ser number")
+            throw new BadRequestError("'password' deve ser string")
         }
                      
         const userDB: UserDB | undefined = await this.userDatabase.searchByEmail(email)
