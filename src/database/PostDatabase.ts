@@ -1,4 +1,4 @@
-import { LikeDislikeDB, PostDB, PostWithCommentsDB, PostWithCreatorDB, POST_LIKE } from "../types";
+import { LikeDislikePostDB, PostDB, PostWithCommentsDB, PostWithCreatorDB, POST_LIKE } from "../types";
 import { BaseDatabase } from "./BaseDatabase";
 import { CommentDatabase } from "./CommentDatabase";
 import { UserDatabase } from "./UserDatabase";
@@ -94,46 +94,46 @@ export class PostDatabase extends BaseDatabase {
         
     }
 
-    public likeOrDislikePost = async (likeDislikeDB: LikeDislikeDB): Promise<void> => {
+    public likeOrDislikePost = async (likeDislikePostDB: LikeDislikePostDB): Promise<void> => {
         await BaseDatabase
             .connection(PostDatabase.TABLE_LIKES_DISLIKES_POSTS)
-            .insert(likeDislikeDB)
+            .insert(likeDislikePostDB)
     }
 
-    public searchLikeDislike = async (likeDislikeDBToFind: LikeDislikeDB): Promise<POST_LIKE | null> => {
-        const [ likeDislikeDB ]: LikeDislikeDB[] = await BaseDatabase
+    public searchLikeDislike = async (likeDislikePostDBToFind: LikeDislikePostDB): Promise<POST_LIKE | null> => {
+        const [ likeDislikePostDB ]: LikeDislikePostDB[] = await BaseDatabase
             .connection(PostDatabase.TABLE_LIKES_DISLIKES_POSTS)
             .select()
             .where({
-                user_id: likeDislikeDBToFind.user_id,
-                post_id: likeDislikeDBToFind.post_id
+                user_id: likeDislikePostDBToFind.user_id,
+                post_id: likeDislikePostDBToFind.post_id
             })
 
-        if(likeDislikeDB) {
-            return likeDislikeDB.like === 1 ? POST_LIKE.ALREADY_LIKED : POST_LIKE.ALREADY_DISLIKED
+        if(likeDislikePostDB) {
+            return likeDislikePostDB.like === 1 ? POST_LIKE.ALREADY_LIKED : POST_LIKE.ALREADY_DISLIKED
         } else {
             return null
         }
 
     }
 
-    public removeLikeDislike = async (likeDislikeDB :LikeDislikeDB) => {
+    public removeLikeDislike = async (likeDislikePostDB :LikeDislikePostDB) => {
         await BaseDatabase
             .connection(PostDatabase.TABLE_LIKES_DISLIKES_POSTS)
             .delete()
             .where({
-                user_id: likeDislikeDB.user_id,
-                post_id: likeDislikeDB.post_id
+                user_id: likeDislikePostDB.user_id,
+                post_id: likeDislikePostDB.post_id
             })
     }
 
-    public updateLikeDislike = async (likeDislikeDB: LikeDislikeDB) => {
+    public updateLikeDislike = async (likeDislikePostDB: LikeDislikePostDB) => {
         await BaseDatabase
             .connection(PostDatabase.TABLE_LIKES_DISLIKES_POSTS)
-            .update(likeDislikeDB)
+            .update(likeDislikePostDB)
             .where({
-                user_id: likeDislikeDB.user_id,
-                post_id: likeDislikeDB.post_id
+                user_id: likeDislikePostDB.user_id,
+                post_id: likeDislikePostDB.post_id
             })
     }
     

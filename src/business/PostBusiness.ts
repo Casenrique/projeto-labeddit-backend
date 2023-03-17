@@ -5,7 +5,14 @@ import { NotFoundError } from "../errors/NotFoundError"
 import { Post } from "../models/Post"
 import { IdGenerator } from "../services/IdGenerator"
 import { TokenManager } from "../services/TokenManager"
-import { CreatorPost, LikeDislikeDB, PostCreatorModel, PostDB, POST_LIKE, TokenPayLoad, USER_ROLES } from "../types"
+import { 
+        CreatorPost, 
+        LikeDislikePostDB, 
+        PostCreatorModel, 
+        PostDB, 
+        POST_LIKE, 
+        USER_ROLES 
+    } from "../types"
 
 
 export class PostBusiness {
@@ -241,7 +248,7 @@ export class PostBusiness {
         
         const convertedId = like ? 1 : 0
 
-        const likeDislikeDB: LikeDislikeDB = {
+        const likeDislikePostDB: LikeDislikePostDB = {
             user_id: userId,
             post_id: postWithCreatorDB.id,
             like: convertedId
@@ -265,31 +272,31 @@ export class PostBusiness {
             getCreator(creatorId, creatorNickName)
         )
 
-        const likeDislikeAlreadyExists = await this.postDatabase.searchLikeDislike(likeDislikeDB)
+        const likeDislikeAlreadyExists = await this.postDatabase.searchLikeDislike(likeDislikePostDB)
 
         if(likeDislikeAlreadyExists === POST_LIKE.ALREADY_LIKED) {
 
             if(like) {
-                await this.postDatabase.removeLikeDislike(likeDislikeDB)
+                await this.postDatabase.removeLikeDislike(likeDislikePostDB)
                 post.removeLike()
             } else {
-                await this.postDatabase.updateLikeDislike(likeDislikeDB)
+                await this.postDatabase.updateLikeDislike(likeDislikePostDB)
                 post.removeLike()
                 post.addDislike()
             }
         } else if(likeDislikeAlreadyExists === POST_LIKE.ALREADY_DISLIKED) {
 
             if(like) {
-                await this.postDatabase.updateLikeDislike(likeDislikeDB)
+                await this.postDatabase.updateLikeDislike(likeDislikePostDB)
                 post.removeDislike()
                 post.addLike()
             } else {
-                await this.postDatabase.removeLikeDislike(likeDislikeDB)
+                await this.postDatabase.removeLikeDislike(likeDislikePostDB)
                 post.removeDislike()
             }
 
         } else {
-            await this.postDatabase.likeOrDislikePost(likeDislikeDB)
+            await this.postDatabase.likeOrDislikePost(likeDislikePostDB)
             like ? post.addLike() : post.addDislike()
         }
 

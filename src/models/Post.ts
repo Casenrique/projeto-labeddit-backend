@@ -100,6 +100,10 @@ export class Post {
         this.replies += 1
     }
 
+    public removeReply() {
+        this.replies -= 1
+    }
+
     public getCreatedAt(): string {
         return this.createdAt
     }

@@ -42,3 +42,18 @@ export interface CreateCommentOutputDTO {
     message: string
 }
 
+export interface DeleteCommentInputDTO {
+    idToDelete: string,
+    token: string | undefined
+}
+
+export interface DeleteCommentOutputDTO {
+    message: string
+}
+
+export interface LikeOrDislikeCommentInputDTO {
+    idCommentToLikeOrDislike: string,
+    token: string | undefined,
+    like: unknown
+}
+

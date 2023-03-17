@@ -52,11 +52,11 @@ export class Comment {
         this.likes -= 1
     }
     
-    public addDisLike() {
+    public addDislike() {
         this.dislikes += 1
     }
 
-    public removeDisLike() {
+    public removeDislike() {
         this.dislikes -= 1
     }
         

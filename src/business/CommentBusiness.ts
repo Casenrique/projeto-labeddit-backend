@@ -1,14 +1,20 @@
-import { CommentDatabase } from "../database/CommentDatabase";
-import { PostDatabase } from "../database/PostDatabase";
-import { UserDatabase } from "../database/UserDatabase";
-import { CreateCommentInputDTO, GetCommentsInputDTO, GetPostWithCommentsOutputDTO } from "../dtos/commentDTO";
-import { BadRequestError } from "../errors/BadRequestError";
-import { NotFoundError } from "../errors/NotFoundError";
-import { Comment } from "../models/Comment";
-import { Post } from "../models/Post";
-import { IdGenerator } from "../services/IdGenerator";
-import { TokenManager } from "../services/TokenManager";
-import { CommentModel, CreatorPost, PostCreatorModel, PostDB, PostWithCommentsModel, PostWithCreatorDB, UserDB } from "../types";
+import { CommentDatabase } from "../database/CommentDatabase"
+import { PostDatabase } from "../database/PostDatabase"
+import { CreateCommentInputDTO, DeleteCommentInputDTO, GetCommentsInputDTO, LikeOrDislikeCommentInputDTO } from "../dtos/commentDTO"
+import { BadRequestError } from "../errors/BadRequestError"
+import { NotFoundError } from "../errors/NotFoundError"
+import { Comment } from "../models/Comment"
+import { Post } from "../models/Post"
+import { IdGenerator } from "../services/IdGenerator"
+import { TokenManager } from "../services/TokenManager"
+import { 
+    CommentDB,
+        CreatorPost, 
+        LikeDislikePostCommentDB, 
+        PostWithCreatorDB, 
+        POST_LIKE, 
+        USER_ROLES
+    } from "../types"
 
 
 
@@ -16,7 +22,6 @@ export class CommentBusiness {
     constructor(
         private commentDatabase: CommentDatabase,
         private postDatabase: PostDatabase,
-        private userDatabase: UserDatabase,
         private tokenManager: TokenManager,
         private idGenerator: IdGenerator
     ) {}
@@ -106,9 +111,7 @@ export class CommentBusiness {
         const updatedPostDB = updatedPost.toDBModel()
 
         await this.postDatabase.updatePost(idToComment, updatedPostDB)
-
-        console.log(updatedPostDB)       
-        
+      
         const comment = new Comment(
             commentId,
             content,
@@ -131,97 +134,190 @@ export class CommentBusiness {
         const commentDB = comment.toDBModel()
 
         await this.commentDatabase.insert(commentDB)
+    }
+
+    public deleteComment = async (input: DeleteCommentInputDTO): Promise<void> => {
+        
+        const { idToDelete, token } = input
+       
+        if(token === undefined) {
+            throw new BadRequestError("token ausente")
+        }
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if(payload === null) {
+            throw new BadRequestError("token inválido")
+        }
+        
+        const commentDB: CommentDB | undefined = await this.commentDatabase.searchCommentById(idToDelete)
+
+        console.log(commentDB)
+        
+        if(!commentDB) {
+            throw new NotFoundError("'id' do comment não encontrado.")            
+        }
+
+        const creatorId = payload.id
+
+        if(payload.role !== USER_ROLES.ADMIN
+            && commentDB.creator_id !== creatorId
+            ) {
+            throw new BadRequestError("Somente o criador do comment ou admistrador pode apagá-lo.")
+        }
+        
+        const postWithCreatorDB: PostWithCreatorDB | undefined = await this.postDatabase.getPostWithCreatorById(commentDB.post_id)
+
+        if(!postWithCreatorDB) {
+            throw new BadRequestError("'id' não encontrado")
+        }
+
+        function getCreator(postCreatorId: string, postCreatorNickName: string): CreatorPost {
+            return {
+                id: postCreatorId,
+                nickName: postCreatorNickName
+            }
+        }
+
+        const updatedPost = new Post (
+            postWithCreatorDB.id,
+            postWithCreatorDB.content,
+            postWithCreatorDB.likes,
+            postWithCreatorDB.dislikes,
+            postWithCreatorDB.replies,
+            postWithCreatorDB.created_at,
+            postWithCreatorDB.updated_at,
+            getCreator(postWithCreatorDB.creator_id, postWithCreatorDB.creator_nick_name)
+        )
+
+        console.log(updatedPost)
+
+        updatedPost.removeReply()
+
+        const updatedPostDB = updatedPost.toDBModel()
+
+        await this.postDatabase.updatePost(commentDB.post_id, updatedPostDB)
+
+        await this.commentDatabase.deleteComment(idToDelete)        
 
     }
 
-    // public likeOrDislikePost = async (input: LikeOrDislikePostInputDTO): Promise<void> => {
+    public likeOrDislikeComment = async (input: LikeOrDislikeCommentInputDTO): Promise<void> => {
         
-    //     const { idToLikeOrDislike, token, like } = input
+        const { idCommentToLikeOrDislike, token, like } = input
        
-    //     if(token === undefined) {
-    //         throw new BadRequestError("token ausente")
-    //     }
+        if(token === undefined) {
+            throw new BadRequestError("token ausente")
+        }
 
-    //     const payload = this.tokenManager.getPayload(token)
+        const payload = this.tokenManager.getPayload(token)
 
-    //     if(payload === null) {
-    //         throw new BadRequestError("token inválido")
-    //     }
+        if(payload === null) {
+            throw new BadRequestError("token inválido")
+        }
 
-    //     if(typeof like !== "boolean") {
-    //         throw new BadRequestError("'like' deve ser boolean")            
-    //     }
+        if(typeof like !== "boolean") {
+            throw new BadRequestError("'like' deve ser boolean")            
+        }
         
-    //     const postWithCreatorDB = await this.postDatabase.getPostWithCreatorById(idToLikeOrDislike)
+        const commentWithCreatorDB = await this.commentDatabase.getCommentWithCreator(idCommentToLikeOrDislike)
 
-    //     if(!postWithCreatorDB) {
-    //         throw new NotFoundError("'id' do post não encontrado.")            
-    //     }
+        console.log(commentWithCreatorDB)
 
-    //     const userId = payload.id
-    //     const creatorId = postWithCreatorDB.creator_id
-    //     const creatorNickName = postWithCreatorDB.creator_nick_name
+        if(!commentWithCreatorDB) {
+            throw new NotFoundError("'id' do post não encontrado.")            
+        }
+
+        const userId = payload.id
+        const creatorId = commentWithCreatorDB.creator_id
+        const creatorNickName = commentWithCreatorDB.comment_creator_nick_name
         
-    //     if(postWithCreatorDB.creator_id === userId) {
-    //         throw new BadRequestError("O criador do post não pode dar like ou dislike em seu próprio post")
-    //     }   
+        if(commentWithCreatorDB.creator_id === userId) {
+            throw new BadRequestError("O criador do commentário não pode dar like ou dislike em seu próprio commentário")
+        }   
+
+        const postWithCreatorDB: PostWithCreatorDB | undefined = await this.postDatabase.getPostWithCreatorById(commentWithCreatorDB.post_id)
+
+        if(!postWithCreatorDB) {
+            throw new BadRequestError("'id' não encontrado")
+        }
+
+       
+        function getCreator(postCreatorId: string, postCreatorNickName: string): CreatorPost {
+            return {
+                id: postCreatorId,
+                nickName: postCreatorNickName
+            }
+        }
+
+        const post = new Post (
+            postWithCreatorDB.id,
+            postWithCreatorDB.content,
+            postWithCreatorDB.likes,
+            postWithCreatorDB.dislikes,
+            postWithCreatorDB.replies,
+            postWithCreatorDB.created_at,
+            postWithCreatorDB.updated_at,
+            getCreator(postWithCreatorDB.creator_id, postWithCreatorDB.creator_nick_name)
+        )
         
-    //     const convertedId = like ? 1 : 0
+        const convertedId = like ? 1 : 0
 
-    //     const likeDislikeDB: LikeDislikeDB = {
-    //         user_id: userId,
-    //         post_id: postWithCreatorDB.id,
-    //         like: convertedId
-    //     }
+        const likeDislikePostCommentDB: LikeDislikePostCommentDB = {
+            user_id: userId,
+            comment_id: commentWithCreatorDB.id,
+            like: convertedId
+        }        
         
-    //     function getCreator(creatorId: string, creatorNickName: string): CreatorPost {
-    //         return {
-    //             id: creatorId,
-    //             nickName: creatorNickName
-    //         }
-    //      }
+        const comment = new Comment(
+            commentWithCreatorDB.id,
+            commentWithCreatorDB.content,
+            commentWithCreatorDB.likes,
+            commentWithCreatorDB.dislikes,
+            commentWithCreatorDB.created_at,
+            commentWithCreatorDB.updated_at,
+            commentWithCreatorDB.creator_id,
+            commentWithCreatorDB.comment_creator_nick_name,
+            commentWithCreatorDB.post_id,
+            postWithCreatorDB.creator_id,
+            postWithCreatorDB.content,
+            postWithCreatorDB.likes,
+            postWithCreatorDB.dislikes,
+            postWithCreatorDB.replies,
+            postWithCreatorDB.created_at,
+            postWithCreatorDB.updated_at
+        )              
 
-    //     const post = new Post(
-    //         postWithCreatorDB.id,
-    //         postWithCreatorDB.content,
-    //         postWithCreatorDB.likes,
-    //         postWithCreatorDB.dislikes,
-    //         postWithCreatorDB.replies,
-    //         postWithCreatorDB.created_at,
-    //         postWithCreatorDB.updated_at,
-    //         getCreator(creatorId, creatorNickName)
-    //     )
+        const likeDislikeAlreadyExists = await 
+            this.commentDatabase.searchLikeDislike(likeDislikePostCommentDB)
 
-    //     const likeDislikeAlreadyExists = await this.postDatabase.searchLikeDislike(likeDislikeDB)
+        if(likeDislikeAlreadyExists === POST_LIKE.ALREADY_LIKED) {
 
-    //     if(likeDislikeAlreadyExists === POST_LIKE.ALREADY_LIKED) {
+            if(like) {
+                await this.commentDatabase.removeLikeDislike(likeDislikePostCommentDB)
+                comment.removeLike()
+            } else {
+                await this.commentDatabase.updateLikeDislike(likeDislikePostCommentDB)
+                comment.removeLike()
+                comment.addDislike()
+            }
+        } else if(likeDislikeAlreadyExists === POST_LIKE.ALREADY_DISLIKED) {
 
-    //         if(like) {
-    //             await this.postDatabase.removeLikeDislike(likeDislikeDB)
-    //             post.removeLike()
-    //         } else {
-    //             await this.postDatabase.updateLikeDislike(likeDislikeDB)
-    //             post.removeLike()
-    //             post.addDislike()
-    //         }
-    //     } else if(likeDislikeAlreadyExists === POST_LIKE.ALREADY_DISLIKED) {
+            if(like) {
+                await this.commentDatabase.updateLikeDislike(likeDislikePostCommentDB)
+                comment.removeDislike()
+                comment.addLike()
+            } else {
+                await this.commentDatabase.removeLikeDislike(likeDislikePostCommentDB)
+                comment.removeDislike()
+            }
 
-    //         if(like) {
-    //             await this.postDatabase.updateLikeDislike(likeDislikeDB)
-    //             post.removeDislike()
-    //             post.addLike()
-    //         } else {
-    //             await this.postDatabase.removeLikeDislike(likeDislikeDB)
-    //             post.removeDislike()
-    //         }
+        } else {
+            await this.commentDatabase.likeOrDislikeComment(likeDislikePostCommentDB)
+            like ? comment.addLike() : comment.addDislike()
+        }
 
-    //     } else {
-    //         await this.postDatabase.likeOrDislikePost(likeDislikeDB)
-    //         like ? post.addLike() : post.addDislike()
-    //     }
-
-    //     const updatedPostDB = post.toDBModel()
-    //     await this.postDatabase.updatePost(idToLikeOrDislike, updatedPostDB)
-
-    // }
+        const updatedCommentDB = comment.toDBModel()
+        await this.commentDatabase.updateComment(idCommentToLikeOrDislike, updatedCommentDB)
+    }
 }

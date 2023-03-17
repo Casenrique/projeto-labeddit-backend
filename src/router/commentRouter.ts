@@ -5,7 +5,6 @@ import { CommentDatabase } from "../database/CommentDatabase"
 import { IdGenerator } from "../services/IdGenerator"
 import { TokenManager } from "../services/TokenManager"
 import { PostDatabase } from "../database/PostDatabase"
-import { UserDatabase } from "../database/UserDatabase"
 
 export const commentRouter  = express.Router()
 
@@ -13,7 +12,6 @@ const commentController = new CommentController(
     new CommentBusiness(
         new CommentDatabase(),
         new PostDatabase(),
-        new UserDatabase(),
         new TokenManager(),
         new IdGenerator()        
     )
@@ -21,6 +19,5 @@ const commentController = new CommentController(
 
 commentRouter.get("/:id", commentController.getComments)
 commentRouter.post("/:id", commentController.createComment)
-// commentRouter.put("/:id", commentController.editComment)
-// commentRouter.delete("/:id", commentController.deleteComment)
-// commentRouter.put("/:id/like", commentController.likeOrDislikeComment)
+commentRouter.put("/:id/like", commentController.likeOrDislikeComment)
+commentRouter.delete("/:id", commentController.deleteComment)

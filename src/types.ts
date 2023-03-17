@@ -9,7 +9,6 @@ export interface TokenPayLoad {
     role: USER_ROLES
 }
 
-
 export interface UserDB {
     id: string,
     nick_name: string,
@@ -58,9 +57,15 @@ export interface PostCreatorModel {
     }
 }
 
-export interface LikeDislikeDB {
+export interface LikeDislikePostDB {
     user_id: string,
     post_id: string,
+    like: number
+}
+
+export interface LikeDislikePostCommentDB {
+    user_id: string,
+    comment_id: string,
     like: number
 }
 
@@ -82,6 +87,10 @@ export interface CommentDB {
     updated_at: string,
     creator_id: string,
     post_id: string
+}
+
+export interface CommentWithCreatorNameDB extends CommentDB {    
+    comment_creator_nick_name: string
 }
 
 export interface CommentModel {
