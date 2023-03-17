@@ -121,6 +121,11 @@ DROP TABLE likes_dislikes_post;
 DROP TABLE likes_dislikes_post_comment;
 
 
-UPDATE users
-SET id = "e79fdbf9-d332-47e0-9ecf-8e85ea7f02e2"
-WHERE id = "ea66dc18-f092-4665-871e-9c1bba53f726";
+UPDATE posts
+SET creator_id = "59873459-0568-45b8-8243-b147f98cab71"
+WHERE id = "55fc3f98-0449-4206-9145-882c51befbc1";
+
+
+SELECT * FROM posts
+INNER JOIN comments
+ON posts.id = comments.post_id;

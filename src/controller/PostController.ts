@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { PostBusiness } from "../business/PostBusiness";
-import { CreatePostInputDTO, CreatePostOutputDTO, DeletePostInputDTO, DeletePostOutputDTO, EditPostInputDTO, GetPostsInputDTO, LikeOrDislikePostInputDTO } from "../dtos/PostDTO";
+import { CreatePostInputDTO, CreatePostOutputDTO, DeletePostInputDTO, DeletePostOutputDTO, EditPostInputDTO, EditPostOutputDTO, GetPostsInputDTO, LikeOrDislikePostInputDTO } from "../dtos/PostDTO";
 import { BaseError } from "../errors/BaseError";
 
 
@@ -41,7 +41,7 @@ export class PostController {
             await this.postBusiness.createPost(input)
 
             const output: CreatePostOutputDTO = {
-                message: "Post criado com sucesso!"
+                message: "Post criado com sucesso!",
             }
 
             res.status(201).send(output)
@@ -64,10 +64,14 @@ export class PostController {
                 token: req.headers.authorization,
                 content: req.body.content
             }
-
+            
             await this.postBusiness.editPost(input)
 
-            res.status(200).end()
+            const output: EditPostOutputDTO = {
+                message: "Post editado com sucesso"
+            }
+
+            res.status(200).send(output)
 
         } catch (error) {
             console.log(error)
