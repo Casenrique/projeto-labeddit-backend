@@ -7,7 +7,7 @@ import { BaseDatabase } from "./BaseDatabase";
 export class UserDatabase extends BaseDatabase {
     public static TABLE_USERS = "users"
 
-    public async findUsers(q: string | undefined) {
+    public async findUsers(q: string | undefined): Promise<UserDB[]> {
         if(q) {
             const result: UserDB[] = await BaseDatabase
                 .connection(UserDatabase.TABLE_USERS)
@@ -21,14 +21,14 @@ export class UserDatabase extends BaseDatabase {
         }
     }
 
-    public async findUserById(id: string) {
+    public async findUserById(id: string): Promise<UserDB | undefined> {
         const [ userDB ]: UserDB[] | undefined[] = await BaseDatabase
             .connection(UserDatabase.TABLE_USERS)
             .where({ id })
         return userDB
     }
     
-    public async searchByEmail(email: string): Promise<UserDB> {
+    public async searchByEmail(email: string): Promise<UserDB | undefined> {
         const result: UserDB[] = await BaseDatabase
             .connection(UserDatabase.TABLE_USERS)
             .select()
@@ -38,7 +38,7 @@ export class UserDatabase extends BaseDatabase {
     }
     
     
-    public async insertUser(newUserDB: UserDB) {
+    public async insertUser(newUserDB: UserDB): Promise<void>  {
         await BaseDatabase
             .connection(UserDatabase.TABLE_USERS)
             .insert(newUserDB)
