@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { PostBusiness } from "../business/PostBusiness";
-import { CreatePostInputDTO, CreatePostOutputDTO, DeletePostInputDTO, DeletePostOutputDTO, EditPostInputDTO, EditPostOutputDTO, GetPostsInputDTO, LikeOrDislikePostInputDTO } from "../dtos/postDTOs";
+import { CreatePostInputDTO, CreatePostOutputDTO, DeletePostInputDTO, DeletePostOutputDTO, EditPostInputDTO, EditPostOutputDTO, GetPostsInputDTO, LikeOrDislikePostInputDTO } from "../dtos/postDTO";
 import { BaseError } from "../errors/BaseError";
 
 
