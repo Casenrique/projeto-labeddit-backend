@@ -14,8 +14,7 @@ import {
         PostWithCreatorDB, 
         POST_LIKE, 
         USER_ROLES
-    } from "../types"
-
+} from "../types"
 
 
 export class CommentBusiness {
