@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserBusiness } from "../business/UserBusiness";
-import { CreateUserInputDTO, LoginInputDTO } from "../dtos/UserDTO";
+import { CreateUserInputDTO, LoginInputDTO } from "../dtos/userDTOs";
 import { BaseError } from "../errors/BaseError";
 
 export class UserController {

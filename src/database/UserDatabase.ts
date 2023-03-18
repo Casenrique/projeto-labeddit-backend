@@ -1,4 +1,4 @@
-import { CreateUserInputDTO } from "../dtos/UserDTO";
+import { CreateUserInputDTO } from "../dtos/userDTOs";
 import { User } from "../models/User";
 import { UserDB } from "../types";
 import { BaseDatabase } from "./BaseDatabase";
