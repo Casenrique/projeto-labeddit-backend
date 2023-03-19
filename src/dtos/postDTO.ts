@@ -5,6 +5,11 @@ export interface GetPostsInputDTO {
     token: string | undefined
 }
 
+export interface GetPostByIdInputDTO {
+    id: string,
+    token: string | undefined
+}
+
 export interface GetPostCreatorOutputDTO {
     messsage: string,
     post: {
