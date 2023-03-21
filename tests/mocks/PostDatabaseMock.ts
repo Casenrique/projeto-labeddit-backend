@@ -102,6 +102,8 @@ public searchPostById = async (id: string): Promise<PostDB | undefined> => {
                 updated_at: new Date().toISOString(),
                 creator_id: "id-mock"
         }        
+    } else {
+         return undefined
     }
 }
 

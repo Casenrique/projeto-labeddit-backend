@@ -1,6 +1,7 @@
 import { PostDatabase } from "../database/PostDatabase"
 import { UserDatabase } from "../database/UserDatabase"
-import { CreatePostInputDTO, DeletePostInputDTO, EditPostInputDTO, GetPostByIdInputDTO, LikeOrDislikePostInputDTO } from "../dtos/postDTO"
+import { CreateCommentOutputDTO } from "../dtos/commentDTO"
+import { CreatePostInputDTO, CreatePostOutputDTO, DeletePostInputDTO, DeletePostOutputDTO, EditPostInputDTO, EditPostOutputDTO, GetPostByIdInputDTO, LikeOrDislikePostInputDTO } from "../dtos/postDTO"
 import { BadRequestError } from "../errors/BadRequestError"
 import { NotFoundError } from "../errors/NotFoundError"
 import { Post } from "../models/Post"
@@ -141,7 +142,7 @@ export class PostBusiness {
     
     }
 
-    public createPost = async (input: CreatePostInputDTO): Promise<void> => {
+    public createPost = async (input: CreatePostInputDTO): Promise<CreatePostOutputDTO> => {
         
         const { content, token } = input
        
@@ -186,9 +187,15 @@ export class PostBusiness {
 
         await this.postDatabase.insert(postDB)
 
+        const output: CreatePostOutputDTO = {
+            message: "Post criado com sucesso!"
+        }
+
+        return output
+
     }
 
-    public editPost = async (input: EditPostInputDTO): Promise<void> => {
+    public editPost = async (input: EditPostInputDTO): Promise<EditPostOutputDTO> => {
         
         const { idToEdit, content, token } = input
        
@@ -245,9 +252,14 @@ export class PostBusiness {
 
         await this.postDatabase.updatePost(idToEdit, updatedPostDB)
 
+        const output: EditPostOutputDTO = {
+            message: "Post editado com sucesso"
+        }
+
+        return output
     }
 
-    public deletePost = async (input: DeletePostInputDTO): Promise<void> => {
+    public deletePost = async (input: DeletePostInputDTO): Promise<DeletePostOutputDTO> => {
         
         const { idToDelete, token } = input
        
@@ -278,6 +290,11 @@ export class PostBusiness {
 
         await this.postDatabase.deletePost(idToDelete)
 
+        const output: DeletePostOutputDTO = {
+            message: "Post apagado com sucesso!"
+        }
+
+        return output
     }
 
     public likeOrDislikePost = async (input: LikeOrDislikePostInputDTO): Promise<void> => {
