@@ -1,5 +1,6 @@
 import { PostDatabase } from "../database/PostDatabase"
-import { CreatePostInputDTO, DeletePostInputDTO, EditPostInputDTO, GetPostByIdInputDTO, GetPostsInputDTO, LikeOrDislikePostInputDTO } from "../dtos/postDTO"
+import { UserDatabase } from "../database/UserDatabase"
+import { CreatePostInputDTO, DeletePostInputDTO, EditPostInputDTO, GetPostByIdInputDTO, LikeOrDislikePostInputDTO } from "../dtos/postDTO"
 import { BadRequestError } from "../errors/BadRequestError"
 import { NotFoundError } from "../errors/NotFoundError"
 import { Post } from "../models/Post"
@@ -12,6 +13,8 @@ import {
         PostDB, 
         PostWithCreatorDB, 
         POST_LIKE, 
+        TokenPayLoad, 
+        UserDB, 
         USER_ROLES 
     } from "../types"
 
@@ -19,18 +22,16 @@ import {
 export class PostBusiness {
     constructor(
         private postDatabase: PostDatabase,
+        private userDatabase: UserDatabase,
         private tokenManager: TokenManager,
         private idGenerator: IdGenerator
     ) {}
 
-    public getPosts = async (input: GetPostsInputDTO): Promise<PostCreatorModel[]> => {
+    public getPosts = async (input: any): Promise<PostCreatorModel[]> => {
         
         const { q, token } = input
 
-        if(typeof q !== "string") {
-            throw new BadRequestError("'q' deve ser string")
-        }
-        
+              
         if(token === undefined) {
             throw new BadRequestError("token ausente")
         }
@@ -40,13 +41,24 @@ export class PostBusiness {
         if(payload === null) {
             throw new BadRequestError("token inválido")
         }
+       
+        const postsDB: PostDB[] = await this.postDatabase.getPost(q)
 
-        const { 
-            postsDB,
-            creatorsDB
-        } = await this.postDatabase.getPostWithCreator(q)
+        const creatorsDB: UserDB[] = await this.userDatabase.findUsers(q)
 
+     
         const posts: PostCreatorModel[] = postsDB.map((postDB) => {
+            const userSearch = creatorsDB.find((creatorDB) => creatorDB.id === postDB.creator_id)
+                if(!userSearch) {
+                    throw new BadRequestError("usuário não econtrado")
+                }
+
+                const user: TokenPayLoad = {
+                    id: userSearch.id,
+                    nickName: userSearch.nick_name,
+                    role: userSearch.role
+                }
+            
             const post = new Post(
                 postDB.id,
                 postDB.content,
@@ -55,23 +67,26 @@ export class PostBusiness {
                 postDB.replies,
                 postDB.created_at,
                 postDB.updated_at,
-                getCreator(postDB.creator_id)
-            )
+                user            
+                )
 
             const postToBusinesModel = post.toBusinessModel()
                       
             return postToBusinesModel
         })
     
-        function getCreator(creatorId: string): CreatorPost {
-            const creator = creatorsDB.find((creatorDB)  => {
-                return creatorDB.id === creatorId
-            })
-            return {
-                id: creator.id,
-                nickName: creator.nick_name
-            }
-         }
+        // function getCreator(creatorId: string | undefined): CreatorPost | undefined {
+        //     const creator: UserDB | undefined = creatorsDB.find((creatorDB)  => {
+        //         return creatorDB.id === creatorId
+        //     })
+
+        //     const result = {
+        //         id: creator.id,
+        //         nickName: creator.nick_name
+        //     }
+
+        //     return result
+        // }
         
         return posts
     }
@@ -91,10 +106,9 @@ export class PostBusiness {
             throw new BadRequestError("token inválido")
         }
 
-        const postWithCreatorDB: PostWithCreatorDB = 
+        const postWithCreatorDB: PostWithCreatorDB | undefined = 
             await this.postDatabase.getPostWithCreatorById(id)
 
-        
         if(!postWithCreatorDB) {
             throw new NotFoundError("'id' do post não encontrado.")   
         }
@@ -102,11 +116,7 @@ export class PostBusiness {
         const userId = payload.id
         const creatorId = postWithCreatorDB.creator_id
         const creatorNickName = postWithCreatorDB.creator_nick_name
-        
-        if(postWithCreatorDB.creator_id === userId) {
-            throw new BadRequestError("O criador do post não pode dar like ou dislike em seu próprio post")
-        }   
-                        
+                                        
         function getCreator(creatorId: string, creatorNickName: string): CreatorPost {
             return {
                 id: creatorId,
