@@ -1,9 +1,9 @@
 import { Post } from "../models/Post"
 
-export interface GetPostsInputDTO {
-    q: unknown | undefined,
-    token: string | undefined
-}
+// export interface GetPostsInputDTO {
+//     q: string | string[] | undefined, 
+//     token: string | undefined
+// }
 
 export interface GetPostByIdInputDTO {
     id: string,

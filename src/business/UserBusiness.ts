@@ -31,8 +31,6 @@ export class UserBusiness {
             throw new BadRequestError("token inválido")
         }
 
-        // const creatorId = payload.id
-
         if(payload.role !== USER_ROLES.ADMIN) {
             throw new BadRequestError("Somente o administrador de sistema pode acessar esse recurso.")
         }
