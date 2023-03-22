@@ -1,6 +1,6 @@
 import { CommentDatabase } from "../database/CommentDatabase"
 import { PostDatabase } from "../database/PostDatabase"
-import { CreateCommentInputDTO, DeleteCommentInputDTO, GetCommentsInputDTO, LikeOrDislikeCommentInputDTO } from "../dtos/commentDTO"
+import { CreateCommentInputDTO, CreateCommentOutputDTO, DeleteCommentInputDTO, DeleteCommentOutputDTO, GetCommentsInputDTO, GetCommentsOutputDTO, LikeOrDislikeCommentInputDTO } from "../dtos/commentDTO"
 import { BadRequestError } from "../errors/BadRequestError"
 import { NotFoundError } from "../errors/NotFoundError"
 import { Comment } from "../models/Comment"
@@ -9,8 +9,10 @@ import { IdGenerator } from "../services/IdGenerator"
 import { TokenManager } from "../services/TokenManager"
 import { 
     CommentDB,
+        CommentWithCreatorNameDB,
         CreatorPost, 
         LikeDislikePostCommentDB, 
+        PostWithCommentsDB, 
         PostWithCreatorDB, 
         POST_LIKE, 
         USER_ROLES
@@ -25,7 +27,37 @@ export class CommentBusiness {
         private idGenerator: IdGenerator
     ) {}
 
-    public getComments = async (input: GetCommentsInputDTO) => {
+    // public getComments = async (input: GetCommentsInputDTO) => {
+        
+    //     const { token, idToReply } = input
+
+    //     if(token === undefined) {
+    //         throw new BadRequestError("token ausente")
+    //     }
+
+    //     const payload = this.tokenManager.getPayload(token)
+
+    //     if(payload === null) {
+    //         throw new BadRequestError("token inválido")
+    //     }
+
+    //     const postWithCreatorDB: PostWithCreatorDB = 
+    //         await this.commentDatabase.getPostsWithCreatorAndComments(idToReply)
+
+        
+    //     if(!postWithCreatorDB) {
+    //         throw new NotFoundError("'id' do post não encontrado.")   
+    //     }
+
+    //     // const output: GetPostWithCommentsOutputDTO = {
+    //     //     post: postWithCreatorDB
+    //     // }
+
+    //     console.log(postWithCreatorDB)
+    //     return postWithCreatorDB
+    // }
+
+    public getPostComments = async (input: GetCommentsInputDTO) => {
         
         const { token, idToReply } = input
 
@@ -39,23 +71,23 @@ export class CommentBusiness {
             throw new BadRequestError("token inválido")
         }
 
-        const postWithCreatorDB: PostWithCreatorDB = 
-            await this.commentDatabase.getPostsWithCreatorAndComments(idToReply)
+        const postWithCreatorDB: GetCommentsOutputDTO[] | undefined = 
+            await this.commentDatabase.getPostComments(idToReply)
 
         
         if(!postWithCreatorDB) {
             throw new NotFoundError("'id' do post não encontrado.")   
         }
-
-        // const output: GetPostWithCommentsOutputDTO = {
-        //     post: postWithCreatorDB
-        // }
+      
 
         console.log(postWithCreatorDB)
+
         return postWithCreatorDB
     }
 
-    public createComment = async (input: CreateCommentInputDTO): Promise<void> => {
+
+
+    public createComment = async (input: CreateCommentInputDTO): Promise<CreateCommentOutputDTO> => {
         
         const { content, token, idToComment } = input
        
@@ -76,7 +108,7 @@ export class CommentBusiness {
         const postWithCreatorDB: PostWithCreatorDB | undefined = await this.postDatabase.getPostWithCreatorById(idToComment)
 
         if(!postWithCreatorDB) {
-            throw new BadRequestError("'id' não encontrado")
+            throw new NotFoundError("'id' não encontrado")
         }
 
         const commentId = this.idGenerator.generate()
@@ -133,9 +165,15 @@ export class CommentBusiness {
         const commentDB = comment.toDBModel()
 
         await this.commentDatabase.insert(commentDB)
+
+        const output: CreateCommentOutputDTO = {
+            message: "Comentário criado com sucesso"
+        }
+
+        return output
     }
 
-    public deleteComment = async (input: DeleteCommentInputDTO): Promise<void> => {
+    public deleteComment = async (input: DeleteCommentInputDTO): Promise<DeleteCommentOutputDTO> => {
         
         const { idToDelete, token } = input
        
@@ -168,7 +206,7 @@ export class CommentBusiness {
         const postWithCreatorDB: PostWithCreatorDB | undefined = await this.postDatabase.getPostWithCreatorById(commentDB.post_id)
 
         if(!postWithCreatorDB) {
-            throw new BadRequestError("'id' não encontrado")
+            throw new NotFoundError("'id' não encontrado")
         }
 
         function getCreator(postCreatorId: string, postCreatorNickName: string): CreatorPost {
@@ -197,7 +235,13 @@ export class CommentBusiness {
 
         await this.postDatabase.updatePost(commentDB.post_id, updatedPostDB)
 
-        await this.commentDatabase.deleteComment(idToDelete)        
+        await this.commentDatabase.deleteComment(idToDelete)   
+        
+        const output: DeleteCommentOutputDTO = {
+            message: "Comentário apagado com sucesso"
+        }
+
+        return output
 
     }
 
@@ -224,13 +268,11 @@ export class CommentBusiness {
         console.log(commentWithCreatorDB)
 
         if(!commentWithCreatorDB) {
-            throw new NotFoundError("'id' do post não encontrado.")            
+            throw new NotFoundError("'id' do comment não encontrado.")            
         }
 
         const userId = payload.id
-        const creatorId = commentWithCreatorDB.creator_id
-        const creatorNickName = commentWithCreatorDB.comment_creator_nick_name
-        
+              
         if(commentWithCreatorDB.creator_id === userId) {
             throw new BadRequestError("O criador do commentário não pode dar like ou dislike em seu próprio commentário")
         }   
