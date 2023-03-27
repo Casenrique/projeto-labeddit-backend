@@ -1,5 +1,5 @@
 import { CommentBusiness } from "../../src/business/CommentBusiness"
-import { CreateCommentInputDTO, DeleteCommentInputDTO, GetCommentsInputDTO, LikeOrDislikeCommentInputDTO } from "../../src/dtos/commentDTO"
+import { LikeOrDislikeCommentInputDTO } from "../../src/dtos/commentDTO"
 import { BadRequestError } from "../../src/errors/BadRequestError"
 import { NotFoundError } from "../../src/errors/NotFoundError"
 import { CommentDatabaseMock } from "../mocks/CommentDatabaseMock"

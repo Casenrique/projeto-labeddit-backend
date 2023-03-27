@@ -17,8 +17,7 @@ const commentController = new CommentController(
     )
 )
 
-// commentRouter.get("/:id", commentController.getComments)
-commentRouter.get("/post/:id", commentController.getPostComments)
+commentRouter.get("/:id", commentController.getPostComments)
 commentRouter.post("/:id", commentController.createComment)
 commentRouter.put("/:id/like", commentController.likeOrDislikeComment)
 commentRouter.delete("/:id", commentController.deleteComment)

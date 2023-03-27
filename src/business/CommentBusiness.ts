@@ -9,10 +9,8 @@ import { IdGenerator } from "../services/IdGenerator"
 import { TokenManager } from "../services/TokenManager"
 import { 
     CommentDB,
-        CommentWithCreatorNameDB,
         CreatorPost, 
         LikeDislikePostCommentDB, 
-        PostWithCommentsDB, 
         PostWithCreatorDB, 
         POST_LIKE, 
         USER_ROLES
@@ -27,35 +25,7 @@ export class CommentBusiness {
         private idGenerator: IdGenerator
     ) {}
 
-    // public getComments = async (input: GetCommentsInputDTO) => {
-        
-    //     const { token, idToReply } = input
-
-    //     if(token === undefined) {
-    //         throw new BadRequestError("token ausente")
-    //     }
-
-    //     const payload = this.tokenManager.getPayload(token)
-
-    //     if(payload === null) {
-    //         throw new BadRequestError("token inválido")
-    //     }
-
-    //     const postWithCreatorDB: PostWithCreatorDB = 
-    //         await this.commentDatabase.getPostsWithCreatorAndComments(idToReply)
-
-        
-    //     if(!postWithCreatorDB) {
-    //         throw new NotFoundError("'id' do post não encontrado.")   
-    //     }
-
-    //     // const output: GetPostWithCommentsOutputDTO = {
-    //     //     post: postWithCreatorDB
-    //     // }
-
-    //     console.log(postWithCreatorDB)
-    //     return postWithCreatorDB
-    // }
+    
 
     public getPostComments = async (input: GetCommentsInputDTO) => {
         
