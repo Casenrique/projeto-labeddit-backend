@@ -1,21 +1,21 @@
-import { PostBusiness } from "../../src/business/PostBusiness"
-import { LikeOrDislikePostInputDTO } from "../../src/dtos/postDTO"
+import { CommentBusiness } from "../../src/business/CommentBusiness"
+import { LikeOrDislikeCommentInputDTO } from "../../src/dtos/commentDTO"
 import { BadRequestError } from "../../src/errors/BadRequestError"
 import { NotFoundError } from "../../src/errors/NotFoundError"
+import { CommentDatabaseMock } from "../mocks/CommentDatabaseMock"
 import { IdGeneratorMock } from "../mocks/IdGeneratorMock"
 import { PostDatabaseMock } from "../mocks/PostDatabaseMock"
 import { TokenManagerMock } from "../mocks/TokenManagerMock"
-import { UserDatabaseMock } from "../mocks/UserDatabaseMock"
 
 
-describe("likeOrDislikePost", () => {
-    const postBusiness = new PostBusiness(
+
+describe("likeOrDislikeComment", () => {
+    const commentBusiness = new CommentBusiness(
+        new CommentDatabaseMock(),
         new PostDatabaseMock(),
-        new UserDatabaseMock(),
         new TokenManagerMock(),
         new IdGeneratorMock()
     )
-
 
     test("deve disparar erro caso token não seja informado", async () => {
         
@@ -23,13 +23,13 @@ describe("likeOrDislikePost", () => {
 
         try {
 
-            const input: LikeOrDislikePostInputDTO = {                
-                idToLikeOrDislike: "id-mock",
+            const input: LikeOrDislikeCommentInputDTO = {                
+                idCommentToLikeOrDislike: "id-mock",
                 token: undefined,
                 like: true
             }
 
-            await postBusiness.likeOrDislikePost(input)
+            await commentBusiness.likeOrDislikeComment(input)
 
         } catch (error) {
             if(error instanceof BadRequestError) {
@@ -45,13 +45,13 @@ describe("likeOrDislikePost", () => {
 
         try {
 
-            const input: LikeOrDislikePostInputDTO = {
-                idToLikeOrDislike: "id-mock",
+            const input: LikeOrDislikeCommentInputDTO = {
+                idCommentToLikeOrDislike: "id-mock",
                 token: "token-incorreto",
                 like: true
             }
 
-            await postBusiness.likeOrDislikePost(input)
+            await commentBusiness.likeOrDislikeComment(input)
 
         } catch (error) {
             if(error instanceof BadRequestError) {
@@ -68,17 +68,17 @@ describe("likeOrDislikePost", () => {
 
         try {
 
-            const input: LikeOrDislikePostInputDTO = {
-                idToLikeOrDislike: "id-mock-inexistente",
+            const input: LikeOrDislikeCommentInputDTO = {
+                idCommentToLikeOrDislike: "id-mock-inexistente",
                 token: "token-mock-normal",
                 like: true
             }
 
-            await postBusiness.likeOrDislikePost(input)
+            await commentBusiness.likeOrDislikeComment(input)
 
         } catch (error) {
             if(error instanceof NotFoundError) {
-                expect(error.message).toBe("'id' do post não encontrado.")
+                expect(error.message).toBe("'id' do comment não encontrado.")
                 expect(error.statusCode).toBe(404)
             }
         }
@@ -90,13 +90,13 @@ describe("likeOrDislikePost", () => {
 
         try {
 
-            const input: LikeOrDislikePostInputDTO = {
-                idToLikeOrDislike: "id-mock",
+            const input: LikeOrDislikeCommentInputDTO = {
+                idCommentToLikeOrDislike: "id-mock",
                 token: "token-mock-normal",
                 like: "true"
             }
 
-            await postBusiness.likeOrDislikePost(input)
+            await commentBusiness.likeOrDislikeComment(input)
 
         } catch (error) {
             if(error instanceof BadRequestError) {
