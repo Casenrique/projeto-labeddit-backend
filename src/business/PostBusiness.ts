@@ -1,6 +1,5 @@
 import { PostDatabase } from "../database/PostDatabase"
 import { UserDatabase } from "../database/UserDatabase"
-import { CreateCommentOutputDTO } from "../dtos/commentDTO"
 import { CreatePostInputDTO, CreatePostOutputDTO, DeletePostInputDTO, DeletePostOutputDTO, EditPostInputDTO, EditPostOutputDTO, GetPostByIdInputDTO, LikeOrDislikePostInputDTO } from "../dtos/postDTO"
 import { BadRequestError } from "../errors/BadRequestError"
 import { NotFoundError } from "../errors/NotFoundError"
@@ -76,19 +75,7 @@ export class PostBusiness {
             return postToBusinesModel
         })
     
-        // function getCreator(creatorId: string | undefined): CreatorPost | undefined {
-        //     const creator: UserDB | undefined = creatorsDB.find((creatorDB)  => {
-        //         return creatorDB.id === creatorId
-        //     })
-
-        //     const result = {
-        //         id: creator.id,
-        //         nickName: creator.nick_name
-        //     }
-
-        //     return result
-        // }
-        
+                
         return posts
     }
 
@@ -158,6 +145,10 @@ export class PostBusiness {
 
         if(typeof content !== "string") {
             throw new BadRequestError("'content' deve ser string")
+        }
+
+        if(content.length < 4) {
+            throw new BadRequestError("'content' deve possuir no mínimo 4 caracteres")            
         }
 
         const id = this.idGenerator.generate()

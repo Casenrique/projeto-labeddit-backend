@@ -75,6 +75,10 @@ export class CommentBusiness {
             throw new BadRequestError("'content' deve ser string")
         }
 
+        if(content.length < 4) {
+            throw new BadRequestError("'content' deve possuir no mínimo 4 caracteres")            
+        }
+
         const postWithCreatorDB: PostWithCreatorDB | undefined = await this.postDatabase.getPostWithCreatorById(idToComment)
 
         if(!postWithCreatorDB) {
