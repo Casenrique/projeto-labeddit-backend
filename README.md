@@ -68,6 +68,7 @@ https://dbdiagram.io/d/640b1861296d97641d86f731
 ## Próximos passos
 
 - [ ] Inclusão de método para reset de senha do usuário.
+- [ ] Aumentar coverage dos testes para além de 75%.
 - [ ] Refatoração de código para código mais limpo.
 
 
