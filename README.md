@@ -8,14 +8,14 @@ API para aplicativo de rede social com interação de postagem, comentário da p
 Aplicação back-end de servidor express com banco de dados sqlite3.
 
 ## Índice
-- <a href="#link">Link do respositório do Frontend</a>
+- <a href="#link-do-repositório-do-frontend">Link do respositório do Frontend</a>
 - <a href="#métodos">Métodos disponíveis na API</a>
 - <a href="#respostas">Respostas esperadas</a>
-- <a href="#fluxograma">Fluxograma do bando de dados</a>
+- <a href="#fluxograma-do-banco-de-dados">Fluxograma do bando de dados</a>
 - <a href="#documentação">Documentação</a>
-- <a href="#tecnologias">Tecnologias utilizadas</a>
-- <a href="#pessoas">Pessoas autoras</a>
-- <a href="#próximos">Próximos passos</a>
+- <a href="#tecnologias-utilizadas">Tecnologias utilizadas</a>
+- <a href="#pessoas-autoras">Pessoas autoras</a>
+- <a href="#próximos-passos">Próximos passos</a>
 
 
 ## Link do respositório do Frontend
